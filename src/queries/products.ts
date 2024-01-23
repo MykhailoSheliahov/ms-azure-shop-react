@@ -8,11 +8,11 @@ export function useAvailableProducts() {
   return useQuery<AvailableProduct[], AxiosError>(
     "available-products",
     async () => {
-      const res = await axios.get<Product[]>(
+      const res = await axios.get<AvailableProduct[]>(
         `${API_PATHS.bff}/products`,
         { 'headers': { 'Ocp-Apim-Subscription-Key': '4aec7aa45e4040a384529fd777984a64' } }
       );
-      return res.data.map((product, index) => ({ ...product, count: index + 1 }));
+      return res.data;
     }
   );
 }
@@ -29,11 +29,11 @@ export function useAvailableProduct(id?: string) {
   return useQuery<AvailableProduct, AxiosError>(
     ["product", { id }],
     async () => {
-      const res = await axios.get<Product>(
+      const res = await axios.get<AvailableProduct>(
         `${API_PATHS.bff}/products/${id}`,
         { 'headers': { 'Ocp-Apim-Subscription-Key': '4aec7aa45e4040a384529fd777984a64' } }
       );
-      return { ...res.data, count: 10 };
+      return res.data;
     },
     { enabled: !!id }
   );
@@ -50,9 +50,9 @@ export function useRemoveProductCache() {
 
 export function useUpsertAvailableProduct() {
   return useMutation((values: AvailableProduct) =>
-    axios.put<AvailableProduct>(`${API_PATHS.bff}/product`, values, {
+    axios.post<AvailableProduct>(`${API_PATHS.bff}/products`, values, {
       headers: {
-        Authorization: `Basic ${localStorage.getItem("authorization_token")}`,
+        'Ocp-Apim-Subscription-Key': '4aec7aa45e4040a384529fd777984a64',
       },
     })
   );
